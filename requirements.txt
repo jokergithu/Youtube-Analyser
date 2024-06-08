@@ -1,0 +1,5 @@
+ffmpeg-python
+pytube
+fireworks-ai
+assemblyai
+requests
