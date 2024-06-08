@@ -3,3 +3,4 @@ pytube
 fireworks-ai
 assemblyai
 requests
+streamlit
