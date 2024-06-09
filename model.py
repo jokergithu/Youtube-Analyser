@@ -18,8 +18,24 @@ if not ASSEMBLYAI_API_KEY:
     raise ValueError("ASSEMBLYAI_API_KEY is not set. Please set it as an environment variable.")
 
 # Print API keys for debugging (remove these lines in production)
+transcription_original = ""
 print(f"ASSEMBLYAI_API_KEY: {ASSEMBLYAI_API_KEY}")
 print(f"FIREWORKS_API_KEY: {FIREWORKS_API_KEY}")
+
+def parse_questions(input_string):
+    # Split the input string by double newlines to get individual question blocks
+    question_blocks = input_string.strip().split('\n\n')
+    
+    # Process each question block
+    questions = []
+    for question_block in question_blocks:
+        lines = question_block.split('\n')
+        
+        question = lines[0][3:].strip()
+        options = [line[3:].strip() for line in lines[1:]]
+        questions.append({'question': question, 'options': options})
+    
+    return questions
 
 # Function to download YouTube video
 def download_youtube_video(youtube_url, video_output):
@@ -98,9 +114,19 @@ def extract_action_items(transcription):
 
 # Function to generate MCQs
 def generate_mcqs(transcription):
+    transcription_original = transcription
     prompt = f"Generate 10 multiple choice questions from the following transcript. Only provide the questions and answer options without any additional text or formatting:\n\n{transcription}\n\nMCQs:"
     mcqs = get_completion(prompt)
+    print(mcqs)
     return mcqs.strip()
+
+# evalute answers
+def generate_report(answers):
+    # formated_answers = parse_questions(answers)
+    prompt = f"compare the question answer pair of {answers} with {transcription_original} and generate report for quiz"
+    report = get_completion(prompt)
+    print(report)
+    return report
 
 # Main process function
 def process_video(video_file_path=None, youtube_url=None):

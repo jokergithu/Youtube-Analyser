@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Report</title>
+    <title>You-Quiz</title>
     <style>
         * {
             padding: 0;
@@ -52,18 +52,13 @@
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const report = JSON.parse(localStorage.getItem("report"));
-            const reportPara = document.getElementById("para");
-            let reportHTML = "<strong>Quiz Report:</strong><br>";
-            reportHTML += <br /><strong>${report}</strong>;
+        const reportData = localStorage.getItem("report");
+        console.log(reportData);
 
-            // Set the report HTML content
-            reportPara.innerHTML = reportHTML;
-
-            reportContainer.innerHTML = `<p>${report}</p>`;
-        });
+        const reportPara = document.getElementById("para");
+        reportPara.innerHTML = reportData;
     </script>
+
 </body>
 
 </html>

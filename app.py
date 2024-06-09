@@ -1,7 +1,7 @@
 # app.py
 from flask import Flask, request, redirect, url_for, render_template, jsonify
 import os
-from model import process_video
+from model import process_video, generate_report
 
 app = Flask(__name__)
 UPLOAD_FOLDER = 'uploaded_videos/'
@@ -26,8 +26,8 @@ def upload():
         youtube_link = request.json['link']
         print(youtube_link)
         transcription, action_items, mcqs = process_video(youtube_url=youtube_link)
-        
-        return redirect(url_for('start_quiz', mcqs=mcqs))
+        print(mcqs)
+        return jsonify({'mcqs': mcqs})
     else:
         print("error")
         return jsonify({'error': 'No file or link provided'}), 400
@@ -40,6 +40,15 @@ def start_quiz():
 @app.route('/quiz')
 def quiz():
     return render_template('quiz.html')
+
+@app.route('/submit_quiz', methods=['POST'])
+def submit_quiz():
+    if request.is_json:
+        data = request.get_json()
+        report = generate_report(data)
+        return jsonify({'message': report}), 200
+    else:
+        return jsonify({"error": "Request must be JSON"}), 400
 
 @app.route('/report')
 def report():
