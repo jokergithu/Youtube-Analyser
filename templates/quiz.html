@@ -71,17 +71,38 @@
         .qno {
             margin-top: 12px;
         }
+
+        .loader {
+            border: 10px solid #f3f3f3;
+            border-top: 10px solid #3498db;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 
 <body>
     <div class="App">
-        <div class="quiz-container">
+        <div class="quiz-container" id="quizContainer">
             <h1 class="you-quiz-heading">You-Quiz</h1>
-            <ul class="questions-container" id="questionsContainer">
-            </ul>
-            <div style="display: flex; justify-content: flex-end;">
-                <button class="submit-btn" id="submitButton">Submit</button>
+            <div id="quizInnerContainer">                
+                <ul class="questions-container" id="questionsContainer">
+                </ul>
+                <div style="display: flex; justify-content: flex-end;">
+                    <button class="submit-btn" id="submitButton">Submit</button>
+                </div>
             </div>
         </div>
     </div>
@@ -149,6 +170,15 @@
         document.getElementById("submitButton").addEventListener("click", function (event) {
             // Prevent default form submission
             event.preventDefault();
+            let quizInnerContainer = document.getElementById("quizInnerContainer");
+            let quizContainer = document.getElementById("quizContainer");
+            quizInnerContainer.style.display = "none";
+            const loaderEl = document.createElement("div");
+            loaderEl.classList.add('loader');
+            quizContainer.style.display = "flex";
+            quizContainer.style.flexDirection = "column";
+            quizContainer.style.alignItems = "center";
+            quizContainer.appendChild(loaderEl);
 
             const selectedOptions = {};
 
@@ -190,10 +220,12 @@
                     .catch(error => {
                         console.error("Error:", error);
                         alert("Failed to submit quiz answers.");
+                        quizInnerContainer.style.display = "block";
                     });
             } else {
                 // Show alert if any question is not answered
                 alert("Please answer all questions before submitting.");
+                quizInnerContainer.style.display = "block";
             }
         });
     </script>
