@@ -154,28 +154,29 @@
 
             // If all questions are answered, proceed with form submission
             if (allAnswered) {
-                // Convert selectedOptions object to JSON
-                const jsonData = JSON.stringify(selectedOptions);
-
-                // Send the data to the server using AJAX
-                fetch("/submit_quiz", {
-                    method: "POST",
+                // Send the selected options to the backend
+                fetch('/submit_quiz', {
+                    method: 'POST',
                     headers: {
-                        "Content-Type": "application/json"
+                        'Content-Type': 'application/json'
                     },
-                    body: jsonData
+                    body: JSON.stringify(selectedOptions)
                 })
-                    .then(response => {
-                        if (response.ok) {
-                            window.location.href = "/report";
-                        } else {
-                            alert("Failed to submit quiz answers.");
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error:", error);
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        // Store the report in local storage
+                        localStorage.setItem("report", data.message);
+                        // Redirect to the report page
+                        window.location.href = "/report";
+                    } else {
                         alert("Failed to submit quiz answers.");
-                    });
+                    }
+                })
+                .catch(error => {
+                    console.error("Error submitting quiz:", error);
+                    alert("Failed to submit quiz answers.");
+                });
             } else {
                 // Show alert if any question is not answered
                 alert("Please answer all questions before submitting.");

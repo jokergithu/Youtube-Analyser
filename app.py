@@ -1,7 +1,7 @@
 # app.py
 from flask import Flask, request, redirect, url_for, render_template, jsonify
 import os
-from model import process_video
+from model import process_video, generate_report
 
 app = Flask(__name__)
 UPLOAD_FOLDER = 'uploaded_videos/'
@@ -45,8 +45,8 @@ def quiz():
 def submit_quiz():
     if request.is_json:
         data = request.get_json()
-        print(data)  # Process your quiz data here
-        return jsonify({'message': 'Quiz submitted successfully!'}), 200
+        report = generate_report(data)
+        return jsonify({'message': report}), 200
     else:
         return jsonify({"error": "Request must be JSON"}), 400
 
