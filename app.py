@@ -1,5 +1,5 @@
 # app.py
-from flask import Flask, request, redirect, url_for, render_template
+from flask import Flask, request, redirect, url_for, render_template, jsonify
 import os
 from model import process_video
 
@@ -12,17 +12,25 @@ def index():
     return render_template('index.html')
 
 @app.route('/upload', methods=['POST'])
-def upload_file():
-    if 'file' not in request.files:
-        return redirect(request.url)
-    file = request.files['file']
-    if file.filename == '':
-        return redirect(request.url)
-    if file:
+def upload():
+    if 'file' in request.files:
+        # Handle file upload
+        file = request.files['file']
+        if file.filename == '':
+            return redirect(request.url)
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
         file.save(file_path)
         transcription, action_items, mcqs = process_video(video_file_path=file_path)
         return redirect(url_for('start_quiz', mcqs=mcqs))
+    elif 'link' in request.json:
+        youtube_link = request.json['link']
+        print(youtube_link)
+        transcription, action_items, mcqs = process_video(youtube_url=youtube_link)
+        
+        return redirect(url_for('start_quiz', mcqs=mcqs))
+    else:
+        print("error")
+        return jsonify({'error': 'No file or link provided'}), 400
     return redirect(url_for('index'))
 
 @app.route('/start_quiz')

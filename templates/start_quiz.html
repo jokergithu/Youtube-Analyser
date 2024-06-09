@@ -1,31 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Start Quiz</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .App {
+            background-image: linear-gradient(to right, rgb(196, 233, 253), rgb(165, 192, 251));
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .start-link-container {
+            width: 60%;
+            padding: 30px;
+            border-radius: 10px;
+            background-color: #ffffff;
+            margin: 0 auto;
+        }
+
+        .you-quiz-heading {
+            font-family: sans-serif;
+            text-align: center;
+            color: #0F1128;
+        }
+
+        .start-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 20px;
+            margin-top: 5px;
+        }
+
+        .start-btn {
+            background-color: rgb(110, 128, 255);
+            border-radius: 7px;
+            font-family: sans-serif;
+            height: 40px;
+            width: 110px;
+            color: #ffffff;
+            border: none;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .test-para {
+            font-family: sans-serif;
+            color: #0F1128;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
+
 <body>
-    <div class="container">
-        <h2>Start Quiz</h2>
-        <p id="videoLinkDisplay"></p>
-        <button id="startQuizBtn" class="submit-btn">Start Quiz</button>
+    <div class="App">
+        <div class="start-link-container">
+            <h1 class="you-quiz-heading">You-Quiz</h1>
+            <div class="start-container">
+                <p class="test-para">Let's test your knowledge with a quiz!</p>
+                <button type="submit" id="startQuizBtn" class="start-btn">Start</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const youtubeLink = localStorage.getItem("youtubeLink");
-            if (youtubeLink) {
-                document.getElementById("videoLinkDisplay").innerText = `YouTube Link: ${youtubeLink}`;
-            } else {
-                document.getElementById("videoLinkDisplay").innerText = "No YouTube link provided.";
-            }
-
-            document.getElementById("startQuizBtn").onclick = function() {
+        document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById("startQuizBtn").onclick = function () {
                 window.location.href = "quiz";
             };
         });
     </script>
 </body>
+
 </html>

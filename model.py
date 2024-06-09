@@ -121,7 +121,11 @@ def process_video(video_file_path=None, youtube_url=None):
     os.remove(audio_file_path)  # Clean up audio file
     return transcription, action_items, mcqs
 
+<<<<<<< HEAD
 #if __name__ == "__main__":
+=======
+#if _name_ == "_main_":
+>>>>>>> refs/remotes/origin/main
 #    youtube_url = input("Enter YouTube URL (leave blank if uploading a video file): ").strip()
 #    video_file_path = None if youtube_url else input("Enter the path to the video file: ").strip()
 #    
@@ -133,4 +137,8 @@ def process_video(video_file_path=None, youtube_url=None):
 #    print("\nAction Items:")
 #    print(action_items)
 #    print("\nMCQs:")
+<<<<<<< HEAD
 #    print(mcqs)
+=======
+#    print(mcqs)
+>>>>>>> refs/remotes/origin/main
