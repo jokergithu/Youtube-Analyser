@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
         * {
             padding: 0;
@@ -74,37 +73,115 @@
 </head>
 
 <body>
-    <div class="container">
-        <h2>Quiz</h2>
-        <div id="quizContainer"></div>
-        <button id="nextBtn" class="submit-btn">Next</button>
+    <div class="App">
+        <div class="quiz-container">
+            <h1 class="you-quiz-heading">You-Quiz</h1>
+            <ul class="questions-container" id="questionsContainer">
+            </ul>
+            <div style="display: flex; justify-content: flex-end;">
+                <button class="submit-btn" id="submitButton">Submit</button>
+            </div>
+        </div>
     </div>
+
 
     <script>
         let currentQuestion = 0;
-        const mcqs = JSON.parse(localStorage.getItem("mcqs"));
 
-        function loadQuestion() {
-            if (currentQuestion < mcqs.length) {
-                const question = mcqs[currentQuestion];
-                const quizContainer = document.getElementById("quizContainer");
-                quizContainer.innerHTML = `<p>${question.question}</p>`;
-                question.options.forEach((option, index) => {
-                    quizContainer.innerHTML += `<label><input type="radio" name="option" value="${index}">${option}</label><br>`;
-                });
-            } else {
-                window.location.href = "report";
-            }
+        function parseQuestions(input) {
+            const questions = input.trim().split('\n\n');
+            return questions.map(questionBlock => {
+                const [questionLine, ...optionsLines] = questionBlock.split('\n');
+                const question = questionLine.slice(3).trim();
+                const options = optionsLines.map(line => line.slice(3).trim());
+                return { question, options };
+            });
         }
 
-        document.getElementById("nextBtn").onclick = function () {
-            currentQuestion++;
-            loadQuestion();
-        };
+        const questions = parseQuestions(JSON.parse(localStorage.getItem("mcqs")));
 
-        document.addEventListener("DOMContentLoaded", function () {
-            loadQuestion();
+        const questionsContainer = document.getElementById("questionsContainer");
+
+        questions.forEach((q, index) => {
+            const questionListItem = document.createElement("li");
+            questionListItem.classList.add("options");
+
+            const questionTitle = document.createElement("h3");
+            questionTitle.textContent = "Question " + (index + 1);
+            questionTitle.classList.add("qno");
+
+            const questionText = document.createElement("p");
+            questionText.textContent = q.question;
+            questionText.classList.add("questions");
+
+            const optionsList = document.createElement("ul");
+            q.options.forEach(option => {
+                const optionListItem = document.createElement("li");
+                optionListItem.classList.add("options");
+                const optionInput = document.createElement("input");
+                optionInput.setAttribute("type", "radio");
+                optionInput.setAttribute("name", "q" + (index + 1));
+                optionInput.setAttribute("value", option);
+                optionListItem.appendChild(optionInput);
+                optionListItem.appendChild(document.createTextNode(option));
+                optionsList.appendChild(optionListItem);
+            });
+
+            questionListItem.appendChild(questionTitle);
+            questionListItem.appendChild(questionText);
+            questionListItem.appendChild(optionsList);
+
+            questionsContainer.appendChild(questionListItem);
         });
+
+        // Event listener for submit button
+        document.getElementById("submitButton").addEventListener("click", function (event) {
+            // Prevent default form submission
+            event.preventDefault();
+
+            const selectedOptions = {};
+
+            // Loop through questions and get selected options
+            let allAnswered = true;
+            questions.forEach((q, index) => {
+                const selectedOption = document.querySelector('input[name="q' + (index + 1) + '"]:checked');
+                if (selectedOption) {
+                    selectedOptions[q.question] = selectedOption.value;
+                } else {
+                    allAnswered = false;
+                }
+            });
+
+            // If all questions are answered, proceed with form submission
+            if (allAnswered) {
+                // Convert selectedOptions object to JSON
+                const jsonData = JSON.stringify(selectedOptions);
+
+                // Send the data to the server using AJAX
+                fetch("/submit_quiz", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: jsonData
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            window.location.href = "/report";
+                        } else {
+                            alert("Failed to submit quiz answers.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        alert("Failed to submit quiz answers.");
+                    });
+            } else {
+                // Show alert if any question is not answered
+                alert("Please answer all questions before submitting.");
+            }
+        });
+
     </script>
 </body>
 

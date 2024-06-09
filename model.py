@@ -100,6 +100,7 @@ def extract_action_items(transcription):
 def generate_mcqs(transcription):
     prompt = f"Generate 10 multiple choice questions from the following transcript. Only provide the questions and answer options without any additional text or formatting:\n\n{transcription}\n\nMCQs:"
     mcqs = get_completion(prompt)
+    print(mcqs)
     return mcqs.strip()
 
 # Main process function
