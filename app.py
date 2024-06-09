@@ -4,13 +4,14 @@ import subprocess
 import time
 import os
 from pytube import YouTube
-from textwrap import wrap
-import fireworks
+import fireworks.client
 import assemblyai as aai
-# Set AssemblyAI and Fireworks API keys
+
+# Set up API keys from Streamlit secrets
 aai.settings.api_key = st.secrets["ASSEMBLYAI_API_KEY"]
 api_key = st.secrets["FIREWORKS_API_KEY"]
 fireworks.client.api_key = api_key
+
 # Function to download YouTube video
 def download_youtube_video(youtube_url, video_output):
     yt = YouTube(youtube_url)
@@ -20,24 +21,26 @@ def download_youtube_video(youtube_url, video_output):
 # Function to extract audio from video
 def extract_audio(video_path, audio_output):
     command = f"ffmpeg -i {video_path} -q:a 0 -map a {audio_output}"
-    subprocess.run(command, shell=True)
+    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    if result.returncode != 0:
+        st.error(f"Error extracting audio: {result.stderr}")
+        raise Exception("ffmpeg command failed")
 
 # Function to upload audio to AssemblyAI
 def upload_to_assemblyai(audio_path):
     headers = {
         "authorization": aai.settings.api_key,
     }
-    response = requests.post("https://api.assemblyai.com/v2/upload",
-                             headers=headers,
-                             files={"file": open(audio_path, "rb")})
+    with open(audio_path, "rb") as audio_file:
+        response = requests.post("https://api.assemblyai.com/v2/upload",
+                                 headers=headers,
+                                 files={"file": audio_file})
     return response.json()["upload_url"]
 
 # Function to transcribe audio using AssemblyAI
 def transcribe_audio(audio_url):
     endpoint = "https://api.assemblyai.com/v2/transcript"
-    json = {
-        "audio_url": audio_url
-    }
+    json = {"audio_url": audio_url}
     headers = {
         "authorization": aai.settings.api_key,
         "content-type": "application/json"
@@ -59,28 +62,24 @@ def transcribe_audio(audio_url):
 # Function to get completion using Fireworks API
 def get_completion(prompt, max_tokens=4096):
     fw_model_dir = "accounts/fireworks/models/"
-    model = "llama-v3-70b-instruct"
-    model = fw_model_dir + model
+    model = fw_model_dir + "llama-v3-70b-instruct"
     completion = fireworks.client.Completion.create(
         model=model,
         prompt=prompt,
         max_tokens=max_tokens,
         temperature=0
     )
-
     return completion.choices[0].text.strip()
 
 # Function to extract action items using Fireworks
 def extract_action_items(transcription):
     prompt = f"Extract action items from the following meeting transcript:\n\n{transcription}\n\nAction items:"
-    action_items = get_completion(prompt)
-    return action_items
+    return get_completion(prompt)
 
 # Function to generate MCQs using Fireworks
 def generate_mcqs(transcription):
     prompt = f"Generate 10 multiple choice questions from the following transcript. Only provide the questions and answer options without any additional text or formatting:\n\n{transcription}\n\nMCQs:"
-    mcqs = get_completion(prompt)
-    return mcqs
+    return get_completion(prompt)
 
 # Main process function
 def process_video(video_file_path=None, youtube_url=None):
@@ -134,12 +133,23 @@ def quiz_start_page():
 def quiz_page():
     st.header("Quiz Questions")
     questions = st.session_state.mcqs.split("\n")
+
+    # Ensure we skip empty lines and incorrectly formatted questions
+    questions = [q for q in questions if q.strip() and ":" not in q]
+
     if st.session_state.current_question < len(questions):
-        st.write(questions[st.session_state.current_question])
-        answer = st.radio("Select an option", ["Option A", "Option B", "Option C", "Option D"])
+        question_text = questions[st.session_state.current_question]
+        st.write(f"Question {st.session_state.current_question + 1}: {question_text}")
+        
+        options = []
+        for i in range(1, 5):  # Assume the next 4 lines are options
+            if st.session_state.current_question + i < len(questions):
+                options.append(questions[st.session_state.current_question + i])
+        
+        answer = st.radio("Select an answer:", options)
         if st.button("Next"):
             st.session_state.answers.append(answer)
-            st.session_state.current_question += 1
+            st.session_state.current_question += 5  # Move to the next question block
     else:
         st.session_state.page = "Report"
 
