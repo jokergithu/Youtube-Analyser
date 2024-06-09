@@ -1,0 +1,42 @@
+.submit-link-container {
+    width: 60%;
+    padding: 30px;
+    border-radius: 10px;
+    background-color: #ffffff;
+}
+
+.you-quiz-heading {
+    font-family: sans-serif;
+    text-align: center;
+    color: #0F1128;
+}
+
+.form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px
+}
+
+.link-input {
+    border: 2px solid #EBECEF;
+    outline: none;
+    color: #0F1128;
+    font-weight: 600;
+    height: 30px;
+    width: 80%;
+    padding: 3px 3px 3px 9px;
+    margin-right: 10px;
+}
+
+.generate-btn {
+    background-color: rgb(110,128,255);
+    border-radius: 7px;
+    font-family: sans-serif;
+    height: 40px;
+    width: 110px;
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    outline: none;
+}

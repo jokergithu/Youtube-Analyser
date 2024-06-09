@@ -1,4 +1,5 @@
 from fastapi import FastAPI, UploadFile, Form, HTTPException, Depends
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import os
 import subprocess
@@ -10,6 +11,15 @@ import fireworks
 import assemblyai as aai
 
 app = FastAPI()
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Set your AssemblyAI and Fireworks API keys
 assemblyai_api_key = os.getenv("ASSEMBLYAI_API_KEY", "d2bd36d30d9c43bba76bb4cd295ebe60")
@@ -83,6 +93,7 @@ def generate_mcqs(transcription):
     return mcqs.strip()
 
 # Main process function
+@app.post("/youtube_url")
 def process_video(video_file_path=None, youtube_url=None):
     video_file_path = "downloaded_video.mp4" if youtube_url else video_file_path
     audio_file_path = "output_audio.mp3"
