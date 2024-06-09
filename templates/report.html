@@ -24,6 +24,7 @@
             width: 60%;
             padding: 30px;
             max-height: 75vh;
+            overflow-y: scroll;
             border-radius: 10px;
             background-color: #ffffff;
         }
@@ -37,8 +38,20 @@
         .result {
             font-family: sans-serif;
             color: #0F1128;
-            text-align: center;
+            text-align: left;
             margin-top: 20px;
+        }
+
+        .new-btn {
+            background-color: rgb(110, 128, 255);
+            border-radius: 7px;
+            font-family: sans-serif;
+            height: 40px;
+            width: 110px;
+            color: #ffffff;
+            border: none;
+            cursor: pointer;
+            outline: none;
         }
     </style>
 </head>
@@ -48,15 +61,45 @@
         <div class="quiz-container">
             <h1 class="you-quiz-heading">You-Quiz</h1>
             <p class="result" id="para"></p>
+            <div style="display: flex; justify-content: flex-end;">
+                <button class="new-btn" onclick="goBack()">New</button>
+            </div>
         </div>
     </div>
 
     <script>
+        function formatReport(reportString) {
+            const lines = reportString.trim().split('\n');
+            let reportHTML = '';
+
+            lines.forEach(line => {
+                line = line.replace(/`|[*]+/g, '');
+                // Match question number, question, and answer
+                const match = line.match(/(\d+)\. (.+)/);
+                if (match) {
+                    const questionNumber = match[1];
+                    const questionAndAnswer = match[2];
+                    const [question, answer] = questionAndAnswer.split(' - ');
+
+                    reportHTML += `<div class="report-item"><strong>${questionNumber}. ${question}</strong><br>${answer}</div>`;
+                } else {
+                    reportHTML += `<div class="report-item">${line}</div>`;
+                }
+            });
+
+            return reportHTML;
+        }
+
+
         const reportData = localStorage.getItem("report");
         console.log(reportData);
 
         const reportPara = document.getElementById("para");
-        reportPara.innerHTML = reportData;
+        reportPara.innerHTML = formatReport(reportData);
+
+        function goBack() {
+            window.location.href = "/";
+        }
     </script>
 
 </body>

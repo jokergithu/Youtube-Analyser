@@ -59,6 +59,8 @@
 
         .questions {
             margin-top: 10px;
+            font-family: sans-serif;
+            font-weight: 600;
         }
 
         .options {
@@ -120,10 +122,19 @@
                 optionListItem.classList.add("options");
                 const optionInput = document.createElement("input");
                 optionInput.setAttribute("type", "radio");
+                optionInput.style.height = "20px";
                 optionInput.setAttribute("name", "q" + (index + 1));
+                optionInput.setAttribute("id", option);
                 optionInput.setAttribute("value", option);
+                const optionBody = document.createElement("label");
+                optionBody.style.fontFamily = "arial";
+                optionBody.style.paddingLeft = "10px";
+                optionBody.setAttribute("for", option);
+                optionBody.innerHTML = option;
+                optionListItem.style.display = "flex";
+                optionListItem.style.alignItems = "center";
                 optionListItem.appendChild(optionInput);
-                optionListItem.appendChild(document.createTextNode(option));
+                optionListItem.appendChild(optionBody);
                 optionsList.appendChild(optionListItem);
             });
 
@@ -154,35 +165,37 @@
 
             // If all questions are answered, proceed with form submission
             if (allAnswered) {
-                // Send the selected options to the backend
-                fetch('/submit_quiz', {
-                    method: 'POST',
+                // Convert selectedOptions object to JSON
+                const jsonData = JSON.stringify(selectedOptions);
+
+                // Send the data to the server using AJAX
+                fetch("/submit_quiz", {
+                    method: "POST",
                     headers: {
-                        'Content-Type': 'application/json'
+                        "Content-Type": "application/json"
                     },
-                    body: JSON.stringify(selectedOptions)
+                    body: jsonData
                 })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.message) {
-                        // Store the report in local storage
-                        localStorage.setItem("report", data.message);
-                        // Redirect to the report page
-                        window.location.href = "/report";
-                    } else {
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.message) {
+                            // Store the report in local storage
+                            localStorage.setItem("report", data.message);
+                            // Redirect to the report page
+                            window.location.href = "/report";
+                        } else {
+                            alert("Failed to submit quiz answers.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
                         alert("Failed to submit quiz answers.");
-                    }
-                })
-                .catch(error => {
-                    console.error("Error submitting quiz:", error);
-                    alert("Failed to submit quiz answers.");
-                });
+                    });
             } else {
                 // Show alert if any question is not answered
                 alert("Please answer all questions before submitting.");
             }
         });
-
     </script>
 </body>
 
