@@ -1,11 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        .App {
+            background-image: linear-gradient(to right, rgb(196, 233, 253), rgb(165, 192, 251));
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .quiz-container {
+            width: 60%;
+            padding: 30px;
+            max-height: 75vh;
+            border-radius: 10px;
+            background-color: #ffffff;
+            overflow-y: scroll;
+        }
+
+        .you-quiz-heading {
+            font-family: sans-serif;
+            text-align: center;
+            color: #0F1128;
+        }
+
+        .questions-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: start;
+            margin: 20px;
+            margin-top: 5px;
+        }
+
+        .submit-btn {
+            background-color: rgb(110, 128, 255);
+            border-radius: 7px;
+            font-family: sans-serif;
+            height: 40px;
+            width: 110px;
+            color: #ffffff;
+            border: none;
+            cursor: pointer;
+            outline: none;
+            margin-top: 20px;
+        }
+
+        .questions {
+            margin-top: 10px;
+        }
+
+        .options {
+            list-style: none;
+            margin-top: 10px;
+        }
+
+        .qno {
+            margin-top: 12px;
+        }
+    </style>
 </head>
+
 <body>
     <div class="container">
         <h2>Quiz</h2>
@@ -30,14 +97,15 @@
             }
         }
 
-        document.getElementById("nextBtn").onclick = function() {
+        document.getElementById("nextBtn").onclick = function () {
             currentQuestion++;
             loadQuestion();
         };
 
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             loadQuestion();
         });
     </script>
 </body>
+
 </html>

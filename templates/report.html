@@ -1,23 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz Report</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        .App {
+            background-image: linear-gradient(to right, rgb(196, 233, 253), rgb(165, 192, 251));
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .quiz-container {
+            width: 60%;
+            padding: 30px;
+            max-height: 75vh;
+            border-radius: 10px;
+            background-color: #ffffff;
+        }
+
+        .you-quiz-heading {
+            font-family: sans-serif;
+            text-align: center;
+            color: #0F1128;
+        }
+
+        .result {
+            font-family: sans-serif;
+            color: #0F1128;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
 </head>
+
 <body>
-    <div class="container">
-        <h2>Quiz Report</h2>
-        <div id="reportContainer"></div>
+    <div class="App">
+        <div class="quiz-container">
+            <h1 class="you-quiz-heading">You-Quiz</h1>
+            <p class="result" id="para"></p>
+        </div>
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             const report = JSON.parse(localStorage.getItem("report"));
-            const reportContainer = document.getElementById("reportContainer");
+            const reportPara = document.getElementById("para");
+            let reportHTML = "<strong>Quiz Report:</strong><br>";
+            reportHTML += <br /><strong>${report}</strong>;
+
+            // Set the report HTML content
+            reportPara.innerHTML = reportHTML;
+
             reportContainer.innerHTML = `<p>${report}</p>`;
         });
     </script>
 </body>
+
 </html>

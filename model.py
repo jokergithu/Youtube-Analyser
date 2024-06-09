@@ -1,4 +1,3 @@
-# model.py
 import assemblyai as aai
 import requests
 import time
@@ -7,10 +6,20 @@ import subprocess
 from pytube import YouTube
 from textwrap import wrap
 from fireworks.client import Fireworks
-from getpass import getpass
+import fireworks.client
+from dotenv import load_dotenv
+load_dotenv()
+ASSEMBLYAI_API_KEY = os.getenv('ASSEMBLYAI_API_KEY')
+FIREWORKS_API_KEY = os.getenv('FIREWORKS_API_KEY')
+fireworks.client.api_key = FIREWORKS_API_KEY
 
-# Set AssemblyAI API key
-aai.settings.api_key = "YOUR_ASSEMBLYAI_API_KEY"
+# Ensure the API key is set
+if not ASSEMBLYAI_API_KEY:
+    raise ValueError("ASSEMBLYAI_API_KEY is not set. Please set it as an environment variable.")
+
+# Print API keys for debugging (remove these lines in production)
+print(f"ASSEMBLYAI_API_KEY: {ASSEMBLYAI_API_KEY}")
+print(f"FIREWORKS_API_KEY: {FIREWORKS_API_KEY}")
 
 # Function to download YouTube video
 def download_youtube_video(youtube_url, video_output):
@@ -26,12 +35,23 @@ def extract_audio(video_path, audio_output):
 # Function to upload audio to AssemblyAI
 def upload_to_assemblyai(audio_path):
     headers = {
-        "authorization": "YOUR_ASSEMBLYAI_API_KEY",
+        "authorization": ASSEMBLYAI_API_KEY,
     }
-    response = requests.post("https://api.assemblyai.com/v2/upload",
-                             headers=headers,
-                             files={"file": open(audio_path, "rb")})
-    return response.json()["upload_url"]
+    try:
+        with open(audio_path, "rb") as audio_file:
+            response = requests.post("https://api.assemblyai.com/v2/upload",
+                                     headers=headers,
+                                     files={"file": audio_file})
+        response.raise_for_status()  # Raise an HTTPError for bad responses (4xx and 5xx)
+        response_json = response.json()
+        print(f"Upload response: {response_json}")  # Debugging line
+        return response_json["upload_url"]
+    except requests.exceptions.RequestException as e:
+        print(f"Request failed: {e}")
+        raise
+    except KeyError:
+        print(f"Unexpected response structure: {response_json}")
+        raise
 
 # Function to transcribe audio using AssemblyAI
 def transcribe_audio(audio_url):
@@ -40,10 +60,11 @@ def transcribe_audio(audio_url):
         "audio_url": audio_url
     }
     headers = {
-        "authorization": "YOUR_ASSEMBLYAI_API_KEY",
+        "authorization": ASSEMBLYAI_API_KEY,
         "content-type": "application/json"
     }
     response = requests.post(endpoint, json=json, headers=headers)
+    response.raise_for_status()  # Raise an HTTPError for bad responses (4xx and 5xx)
     transcript_id = response.json()["id"]
 
     # Polling for the transcription result
@@ -61,7 +82,7 @@ def get_completion(prompt, max_tokens=4096):
     fw_model_dir = "accounts/fireworks/models/"
     model = "llama-v3-70b-instruct"
     model = fw_model_dir + model
-    completion = Fireworks.Completion.create(
+    completion = fireworks.client.Completion.create(
         model=model,
         prompt=prompt,
         max_tokens=max_tokens,
@@ -98,5 +119,18 @@ def process_video(video_file_path=None, youtube_url=None):
     if youtube_url:
         os.remove(video_file_path)  # Clean up video file if it was downloaded
     os.remove(audio_file_path)  # Clean up audio file
-
     return transcription, action_items, mcqs
+
+#if _name_ == "_main_":
+#    youtube_url = input("Enter YouTube URL (leave blank if uploading a video file): ").strip()
+#    video_file_path = None if youtube_url else input("Enter the path to the video file: ").strip()
+#    
+#    # Process the video
+#    transcription, action_items, mcqs = process_video(video_file_path=video_file_path, youtube_url=youtube_url)
+##    
+#    print("Transcription:")
+#    print(transcription)
+#    print("\nAction Items:")
+#    print(action_items)
+#    print("\nMCQs:")
+#    print(mcqs)

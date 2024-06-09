@@ -1,42 +1,117 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload Video or Link</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
-    <div class="container">
-        <h2>Upload Video or YouTube Link</h2>
-        
-        <!-- Form to upload YouTube link -->
-        <form id="linkForm" action="start_quiz" method="get" style="margin-bottom: 20px;">
-            <input type="text" id="youtubeLink" name="youtubeLink" placeholder="Enter YouTube link" style="width: 100%; padding: 10px; border: 2px solid #ccc; border-radius: 4px; margin-bottom: 10px;">
-            <input type="submit" value="Submit Link" class="submit-btn">
-        </form>
+    <title>You-Quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
 
-        <!-- Form to upload a file -->
-        <form id="fileForm" action="/upload" method="post" enctype="multipart/form-data">
-            <label for="file-upload" class="custom-file-upload">
-                Select File
-            </label>
-            <input id="file-upload" type="file" name="file">
-            <input type="submit" value="Upload File" class="submit-btn">
-        </form>
+        .App {
+            background-image: linear-gradient(to right, rgb(196, 233, 253), rgb(165, 192, 251));
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .submit-link-container {
+            width: 60%;
+            padding: 30px;
+            border-radius: 10px;
+            background-color: #ffffff;
+            margin: 0 auto;
+            /* Centers the container horizontally */
+        }
+
+        .you-quiz-heading {
+            font-family: sans-serif;
+            text-align: center;
+            color: #0F1128;
+        }
+
+        .form {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px;
+        }
+
+        .link-input {
+            border: 2px solid #EBECEF;
+            outline: none;
+            color: #0F1128;
+            font-weight: 600;
+            height: 30px;
+            width: 80%;
+            padding: 3px 9px;
+            /* Adjust padding as needed */
+            margin-right: 10px;
+        }
+
+        .generate-btn {
+            background-color: rgb(110, 128, 255);
+            border-radius: 7px;
+            font-family: sans-serif;
+            height: 40px;
+            width: 110px;
+            color: #ffffff;
+            border: none;
+            cursor: pointer;
+            outline: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="App">
+        <div class="submit-link-container">
+            <h1 class="you-quiz-heading">You-Quiz</h1>
+            <form id="linkForm" class="form">
+                <input type="text" id="youtubeLink" class="link-input" placeholder="paste your link here">
+                <button type="submit" class="generate-btn">Generate</button>
+            </form>
+        </div>
     </div>
 
+
     <script>
-        document.getElementById("linkForm").onsubmit = function(event) {
-            event.preventDefault();
-            const youtubeLink = document.getElementById("youtubeLink").value;
+        document.getElementById("linkForm").onsubmit = function (event) {
+            event.preventDefault(); // Prevent default form submission behavior
+            const youtubeLink = document.getElementById("youtubeLink").value; // Get the value from the input field
             if (youtubeLink) {
-                localStorage.setItem("youtubeLink", youtubeLink);
-                window.location.href = "start_quiz";
+                // Send the link to the backend using fetch
+                fetch("/upload", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ link: youtubeLink }) // Send the link as JSON data
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            // If the response is successful, redirect to the start_quiz page
+                            window.location.href = "start_quiz";
+                        } else {
+                            throw new Error("Failed to upload link");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        alert("Failed to upload link");
+                    });
             } else {
-                alert("Please enter a YouTube link.");
+                alert("Please enter a YouTube link."); // Alert the user if no link is provided
             }
         };
     </script>
 </body>
+
 </html>
