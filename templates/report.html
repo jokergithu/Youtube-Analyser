@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Report</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h2>Quiz Report</h2>
+        <div id="reportContainer"></div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const report = JSON.parse(localStorage.getItem("report"));
+            const reportContainer = document.getElementById("reportContainer");
+            reportContainer.innerHTML = `<p>${report}</p>`;
+        });
+    </script>
+</body>
+</html>

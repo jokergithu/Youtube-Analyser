@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h2>Quiz</h2>
+        <div id="quizContainer"></div>
+        <button id="nextBtn" class="submit-btn">Next</button>
+    </div>
+
+    <script>
+        let currentQuestion = 0;
+        const mcqs = JSON.parse(localStorage.getItem("mcqs"));
+
+        function loadQuestion() {
+            if (currentQuestion < mcqs.length) {
+                const question = mcqs[currentQuestion];
+                const quizContainer = document.getElementById("quizContainer");
+                quizContainer.innerHTML = `<p>${question.question}</p>`;
+                question.options.forEach((option, index) => {
+                    quizContainer.innerHTML += `<label><input type="radio" name="option" value="${index}">${option}</label><br>`;
+                });
+            } else {
+                window.location.href = "report";
+            }
+        }
+
+        document.getElementById("nextBtn").onclick = function() {
+            currentQuestion++;
+            loadQuestion();
+        };
+
+        document.addEventListener("DOMContentLoaded", function() {
+            loadQuestion();
+        });
+    </script>
+</body>
+</html>

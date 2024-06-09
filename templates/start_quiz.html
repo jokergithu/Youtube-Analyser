@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Start Quiz</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h2>Start Quiz</h2>
+        <p id="videoLinkDisplay"></p>
+        <button id="startQuizBtn" class="submit-btn">Start Quiz</button>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const youtubeLink = localStorage.getItem("youtubeLink");
+            if (youtubeLink) {
+                document.getElementById("videoLinkDisplay").innerText = `YouTube Link: ${youtubeLink}`;
+            } else {
+                document.getElementById("videoLinkDisplay").innerText = "No YouTube link provided.";
+            }
+
+            document.getElementById("startQuizBtn").onclick = function() {
+                window.location.href = "quiz";
+            };
+        });
+    </script>
+</body>
+</html>
